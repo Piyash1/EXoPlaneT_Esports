@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  PLAYER
+  USER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(USER)
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Better Auth requirements
+  emailVerified Boolean   @default(false)
+  sessions      Session[]
+  accounts      Account[]
+
+  playerProfile Player? @relation(fields: [playerId], references: [id])
+  playerId      String? @unique
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model Team {
+  id           String        @id @default(cuid())
+  name         String
+  gameId       String
+  game         Game          @relation(fields: [gameId], references: [id])
+  players      Player[]
+  achievements Achievement[]
+  logoUrl      String?
+  createdAt    DateTime      @default(now())
+}
+
+model Player {
+  id        String   @id @default(cuid())
+  ign       String   @unique // In Game Name
+  fullName  String
+  role      String? // e.g. IGL, Sniper, Entry Fragger
+  teamId    String?
+  team      Team?    @relation(fields: [teamId], references: [id])
+  user      User?
+  image     String?
+  createdAt DateTime @default(now())
+}
+
+model Game {
+  id    String @id @default(cuid())
+  name  String @unique // PUBG Mobile, Apex Legends, etc.
+  type  String // Mobile, PC
+  teams Team[]
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  teamId      String
+  team        Team     @relation(fields: [teamId], references: [id])
+}
+
+model TryoutRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  ign       String
+  game      String
+  discord   String
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  createdAt DateTime @default(now())
+}
