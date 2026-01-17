@@ -59,7 +59,7 @@ export default function HeroSection() {
         >
           <div className="inline-block px-6 py-2 rounded-full border border-blue-500/30 bg-black/60 backdrop-blur-md mb-4 shadow-[0_0_15px_rgba(30,58,138,0.3)]">
             <span className="text-blue-400 text-sm font-bold tracking-[0.2em] uppercase animate-pulse">
-              Deployment Imminent
+              The Future of Esports
             </span>
           </div>
 

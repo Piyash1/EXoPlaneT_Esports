@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { apiResponse } from "@/lib/api-utils";
 import { TeamSchema } from "@/lib/validations";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 /**
  * GET /api/teams
@@ -17,6 +18,14 @@ export async function GET(request: NextRequest) {
       include: {
         game: {
           select: { name: true },
+        },
+        players: {
+          select: {
+            id: true,
+            ign: true,
+            role: true,
+            image: true,
+          },
         },
         _count: {
           select: { players: true },
@@ -44,6 +53,14 @@ export async function POST(request: NextRequest) {
 
     // Validate request body
     const validatedData = TeamSchema.parse(body);
+
+    // If logoUrl is a base64 string, upload to Cloudinary
+    if (validatedData.logoUrl?.startsWith("data:image")) {
+      validatedData.logoUrl = await uploadToCloudinary(
+        validatedData.logoUrl,
+        "teams",
+      );
+    }
 
     const team = await prisma.team.create({
       data: validatedData,

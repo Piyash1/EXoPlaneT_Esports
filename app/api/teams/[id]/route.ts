@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { apiResponse } from "@/lib/api-utils";
+import { TeamSchema } from "@/lib/validations";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 /**
  * GET /api/teams/[id]
@@ -35,6 +37,75 @@ export async function GET(
 
     return apiResponse.success(team);
   } catch (error) {
+    return apiResponse.handleError(error);
+  }
+}
+
+/**
+ * PATCH /api/teams/[id]
+ * Update a team's details
+ */
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    await apiResponse.requireRole(["ADMIN", "MANAGER"]);
+    const { id } = await params;
+    const body = await request.json();
+
+    // Validate request body
+    const validatedData = TeamSchema.partial().parse(body);
+
+    // If logoUrl is a base64 string, upload to Cloudinary
+    if (validatedData.logoUrl?.startsWith("data:image")) {
+      validatedData.logoUrl = await uploadToCloudinary(
+        validatedData.logoUrl,
+        "teams",
+      );
+    }
+
+    const team = await prisma.team.update({
+      where: { id },
+      data: validatedData,
+    });
+
+    return apiResponse.success(team);
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === "Unauthorized")
+        return apiResponse.error("Sign in required", 401);
+      if (error.message === "Forbidden")
+        return apiResponse.error("Admin or Manager access required", 403);
+    }
+    return apiResponse.handleError(error);
+  }
+}
+
+/**
+ * DELETE /api/teams/[id]
+ * Delete a team
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    await apiResponse.requireRole(["ADMIN"]);
+    const { id } = await params;
+
+    await prisma.team.delete({
+      where: { id },
+    });
+
+    return apiResponse.success({ message: "Team deleted successfully" });
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === "Unauthorized")
+        return apiResponse.error("Sign in required", 401);
+      if (error.message === "Forbidden")
+        return apiResponse.error("Admin access required", 403);
+    }
     return apiResponse.handleError(error);
   }
 }

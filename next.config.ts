@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "cdn.discordapp.com", // And Discord
       },
+      {
+        protocol: "https",
+        hostname: "example.com", // For placeholder images
+      },
     ],
   },
 };

@@ -1,51 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, Swords, Trophy, Activity, ArrowUpRight } from "lucide-react";
+import {
+  Users,
+  Swords,
+  Trophy,
+  Activity,
+  ArrowUpRight,
+  ShieldAlert,
+  Cpu,
+  Server,
+  Zap,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-
-const StatCard = ({
-  title,
-  value,
-  icon: Icon,
-  trend,
-  color = "text-white",
-  delay = 0,
-}: any) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay }}
-    className="p-6 rounded-2xl bg-white/5 border border-white/10 relative overflow-hidden group"
-  >
-    <div
-      className={cn(
-        "absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity",
-        color,
-      )}
-    >
-      <Icon className="w-16 h-16" />
-    </div>
-    <div className="relative z-10">
-      <div className="flex items-center gap-2 mb-2">
-        <Icon className={cn("w-5 h-5", color)} />
-        <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          {title}
-        </span>
-      </div>
-      <div className="text-4xl font-heading font-black text-white mb-2">
-        {value}
-      </div>
-      {trend && (
-        <div className="flex items-center gap-1 text-xs font-bold text-green-500">
-          <ArrowUpRight className="w-3 h-3" />
-          {trend} this week
-        </div>
-      )}
-    </div>
-  </motion.div>
-);
+import { HudCard } from "@/components/ui/HudCard";
+import { HudBadge } from "@/components/ui/HudBadge";
+import { ScanningTerminal } from "@/components/ui/ScanningTerminal";
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -54,6 +25,8 @@ export default function AdminDashboardPage() {
     pendingTryouts: 0,
     activePlayers: 0,
   });
+  const [logs, setLogs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -63,90 +36,228 @@ export default function AdminDashboardPage() {
           const result = await res.json();
           if (result.success) {
             setStats(result.data);
+
+            // Mocking some system logs for the terminal
+            setLogs([
+              {
+                id: "1",
+                text: "CORE_ENGINE: SYSTEM_OOT_READY",
+                timestamp: "04:00",
+                type: "success" as const,
+              },
+              {
+                id: "2",
+                text: "DATABASE: LATENCY_7MS",
+                timestamp: "04:02",
+                type: "info" as const,
+              },
+              {
+                id: "3",
+                text: "SECURITY: BRUTE_FORCE_PREVENTED [IP: 192.x.x.x]",
+                timestamp: "04:15",
+                type: "warning" as const,
+              },
+              {
+                id: "4",
+                text: `USERS: ${result.data.users} IDENTITIES_SYNCED`,
+                timestamp: "04:30",
+                type: "info" as const,
+              },
+            ]);
           }
         }
       } catch (error) {
         console.error("Failed to fetch admin stats");
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchStats();
   }, []);
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-heading font-black text-white uppercase tracking-tight">
-          Command Center
-        </h1>
-        <p className="text-muted-foreground text-sm uppercase tracking-widest">
-          System Overview & Metrics
-        </p>
+    <div className="space-y-12 relative pb-12">
+      {/* Background Ambience */}
+      <div className="fixed inset-0 pointer-events-none opacity-10">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-red-600/10 blur-[150px] rounded-full" />
       </div>
 
-      {/* Stats Grid */}
+      {/* Header - Tactical Command Center */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <HudBadge label="Clearance: Level 5" variant="danger" />
+            <HudBadge label="Status: High Alert" variant="warning" />
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-4xl md:text-5xl font-heading font-black text-white uppercase italic tracking-tighter">
+              Command <span className="text-red-500">Center</span>
+            </h1>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="w-12 h-0.5 bg-red-600/50" />
+              <p className="text-[10px] font-mono font-bold uppercase tracking-[0.4em]">
+                System Master Access
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <HudCard
+            variant="ghost"
+            className="p-4 py-3 min-w-[140px] text-center border-red-500/10"
+            showScanningLine={false}
+          >
+            <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest mb-1 flex items-center justify-center gap-2">
+              <Zap className="w-3 h-3 text-red-500" />
+              Neural Link
+            </div>
+            <div className="text-red-500 font-black tracking-tighter text-xl">
+              CONNECTED
+            </div>
+          </HudCard>
+          <HudCard
+            variant="ghost"
+            className="p-4 py-3 min-w-[140px] text-center border-red-500/10"
+            showScanningLine={false}
+          >
+            <div className="text-[9px] text-muted-foreground uppercase font-bold tracking-widest mb-1 flex items-center justify-center gap-2">
+              <Server className="w-3 h-3 text-red-500" />
+              Storage
+            </div>
+            <div className="text-red-500 font-black tracking-tighter text-xl">
+              98% FREE
+            </div>
+          </HudCard>
+        </div>
+      </div>
+
+      {/* Stats Grid - High Alert Modules */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Total Users"
-          value={stats.users}
-          icon={Users}
-          color="text-primary"
-          trend="+12%"
-        />
-        <StatCard
-          title="Total Applications"
-          value={stats.tryouts}
-          icon={Swords}
-          color="text-secondary"
-          delay={0.1}
-        />
-        <StatCard
-          title="Pending Review"
-          value={stats.pendingTryouts}
-          icon={Activity}
-          color="text-yellow-500"
-          delay={0.2}
-          trend={stats.pendingTryouts > 5 ? "Action Required" : null}
-        />
-        <StatCard
-          title="Active Roster"
-          value={stats.activePlayers}
-          icon={Trophy}
-          color="text-red-500"
-          delay={0.3}
-        />
+        <HudCard variant="danger" className="relative group">
+          <div className="flex justify-between items-start mb-4">
+            <Users className="w-6 h-6 text-red-500 group-hover:scale-110 transition-transform" />
+            <span className="text-[8px] font-mono text-red-500/50">
+              MTRC_USR_01
+            </span>
+          </div>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            Global Users
+          </p>
+          <p className="text-4xl font-heading font-black text-white">
+            {stats.users}
+          </p>
+        </HudCard>
+
+        <HudCard variant="danger" className="relative group" delay={0.1}>
+          <div className="flex justify-between items-start mb-4">
+            <Swords className="w-6 h-6 text-red-500 group-hover:scale-110 transition-transform" />
+            <span className="text-[8px] font-mono text-red-500/50">
+              MTRC_APP_02
+            </span>
+          </div>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            Applications
+          </p>
+          <p className="text-4xl font-heading font-black text-white">
+            {stats.tryouts}
+          </p>
+        </HudCard>
+
+        <HudCard variant="danger" className="relative group" delay={0.2}>
+          <div className="flex justify-between items-start mb-4">
+            <Activity className="w-6 h-6 text-red-500 group-hover:scale-110 transition-transform" />
+            <span className="text-[8px] font-mono text-red-500/50">
+              ALRT_PND_03
+            </span>
+          </div>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            Pending Review
+          </p>
+          <p className="text-4xl font-heading font-black text-red-500 italic">
+            {stats.pendingTryouts}
+          </p>
+        </HudCard>
+
+        <HudCard variant="danger" className="relative group" delay={0.3}>
+          <div className="flex justify-between items-start mb-4">
+            <Trophy className="w-6 h-6 text-red-500 group-hover:scale-110 transition-transform" />
+            <span className="text-[8px] font-mono text-red-500/50">
+              MTRC_PLR_04
+            </span>
+          </div>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+            Elite Roster
+          </p>
+          <p className="text-4xl font-heading font-black text-white">
+            {stats.activePlayers}
+          </p>
+        </HudCard>
       </div>
 
-      {/* Recent Actions Section (Placeholder) */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 p-6 rounded-2xl bg-white/5 border border-white/10">
-          <h2 className="text-lg font-bold text-white uppercase tracking-wide mb-4">
-            System Logs
-          </h2>
-          <div className="flex items-center justify-center h-64 text-muted-foreground text-sm border border-dashed border-white/10 rounded-xl">
-            NO RECENT SYSTEM ALERTS
-          </div>
+      {/* Main Command View */}
+      <div className="grid lg:grid-cols-3 gap-8 h-[450px]">
+        <div className="lg:col-span-2">
+          <ScanningTerminal
+            logs={logs}
+            title="SYSTEM_DIAGNOSTIC_FEED"
+            isScanning={isLoading}
+            className="border-red-500/10"
+          />
         </div>
-        <div className="p-6 rounded-2xl bg-red-950/20 border border-red-500/20">
-          <h2 className="text-lg font-bold text-red-500 uppercase tracking-wide mb-4 flex items-center gap-2">
-            <Activity className="w-5 h-5 animate-pulse" />
-            Live Status
+
+        <HudCard
+          variant="danger"
+          className="flex flex-col h-full bg-red-950/10 border-red-500/20"
+        >
+          <h2 className="text-sm font-black text-red-500 uppercase tracking-[0.2em] mb-8 flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 animate-pulse" />
+            Security Matrix
           </h2>
-          <div className="space-y-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Database</span>
-              <span className="text-green-500 font-bold">ONLINE</span>
+
+          <div className="flex-1 space-y-6">
+            <div className="space-y-2">
+              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                <span className="text-muted-foreground">
+                  Firewall Integrity
+                </span>
+                <span className="text-red-500">99.8%</span>
+              </div>
+              <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: "99.8%" }}
+                  className="h-full bg-red-600 shadow-[0_0_10px_rgba(239,68,68,0.5)]"
+                />
+              </div>
             </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">API Gateway</span>
-              <span className="text-green-500 font-bold">ONLINE</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Discord Bot</span>
-              <span className="text-yellow-500 font-bold">MAINTENANCE</span>
+
+            <div className="p-4 rounded-sm bg-red-500/5 border border-red-500/10 space-y-3">
+              <div className="flex justify-between text-[10px] uppercase font-bold tracking-widest text-red-500/70">
+                <span>Node Status</span>
+                <span>Uptime</span>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-[10px] font-mono">
+                  <span className="text-muted-foreground">DB_PRIMARY</span>
+                  <span className="text-green-500">99.9%</span>
+                </div>
+                <div className="flex justify-between text-[10px] font-mono">
+                  <span className="text-muted-foreground">API_GATEWAY</span>
+                  <span className="text-green-500">100%</span>
+                </div>
+                <div className="flex justify-between text-[10px] font-mono">
+                  <span className="text-muted-foreground">CDN_NEXUS</span>
+                  <span className="text-yellow-500">84.2%</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+
+          <button className="w-full py-4 mt-auto border border-red-500/30 text-red-500 text-xs font-black uppercase tracking-[0.3em] hover:bg-red-500 hover:text-white hover:border-red-500 transition-all duration-300">
+            System Overhaul
+          </button>
+        </HudCard>
       </div>
     </div>
   );

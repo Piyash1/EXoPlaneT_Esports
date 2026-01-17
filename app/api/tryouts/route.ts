@@ -13,6 +13,13 @@ export async function GET() {
     await apiResponse.requireRole(["ADMIN", "MANAGER"]);
 
     const requests = await prisma.tryoutRequest.findMany({
+      include: {
+        user: {
+          select: {
+            image: true,
+          },
+        },
+      },
       orderBy: { createdAt: "desc" },
     });
 
