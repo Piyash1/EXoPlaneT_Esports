@@ -24,6 +24,7 @@ export const TryoutRequestSchema = z.object({
   email: z.string().email("Invalid email address"),
   ign: z.string().min(2, "IGN must be at least 2 characters"),
   game: z.string().min(2, "Game name must be at least 2 characters"),
+  role: z.string().min(2, "In-game role must be at least 2 characters"),
   discord: z.string().min(2, "Discord ID must be at least 2 characters"),
   userId: z.string().optional(),
 });

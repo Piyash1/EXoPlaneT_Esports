@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:generate": "bun --bun x prisma generate",
     "db:migrate": "bun --bun x prisma migrate dev",
-    "db:studio": "bun --bun x prisma studio"
+    "db:studio": "bun --bun x prisma studio",
+    "db:push": "bun --bun x prisma db push"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.2.0",

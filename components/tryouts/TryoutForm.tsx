@@ -15,6 +15,7 @@ import {
   Gamepad2,
   AlertCircle,
   Clock,
+  Shield,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -38,11 +39,22 @@ export default function TryoutForm() {
     email: session?.user?.email || "",
     ign: "",
     game: "",
+    role: "",
     discord: "",
   });
 
   const [pendingTryout, setPendingTryout] = useState<any>(null);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
+
+  useEffect(() => {
+    if (session?.user) {
+      setFormData((prev) => ({
+        ...prev,
+        name: session.user.name || prev.name,
+        email: session.user.email || prev.email,
+      }));
+    }
+  }, [session]);
 
   useEffect(() => {
     const checkStatus = async () => {
@@ -73,6 +85,10 @@ export default function TryoutForm() {
     e.preventDefault();
     if (!formData.game) {
       alert("Please select a game.");
+      return;
+    }
+    if (!formData.role) {
+      alert("Please enter your in-game role.");
       return;
     }
 
@@ -254,6 +270,21 @@ export default function TryoutForm() {
             }
             placeholder="username#0000"
             className="bg-white/5 border-white/10 text-white h-12 focus:border-[#5865F2]/50 transition-all"
+          />
+        </div>
+
+        {/* In-Game Role */}
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
+            <Shield className="w-3 h-3 text-orange-500" />
+            In-Game Role
+          </label>
+          <Input
+            required
+            value={formData.role}
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+            placeholder="Duelist / Entry Fragger / IGL"
+            className="bg-white/5 border-white/10 text-white h-12 focus:border-orange-500/50 transition-all"
           />
         </div>
       </div>

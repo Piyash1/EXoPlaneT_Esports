@@ -6,30 +6,20 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  ADMIN
-  MANAGER
-  PLAYER
-  USER
-}
-
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  role      Role     @default(USER)
-  image     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Better Auth requirements
-  emailVerified Boolean   @default(false)
-  sessions      Session[]
-  accounts      Account[]
-
-  playerProfile Player?         @relation(fields: [playerId], references: [id])
+  id            String          @id @default(cuid())
+  email         String          @unique
+  name          String?
+  role          Role            @default(USER)
+  image         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  emailVerified Boolean         @default(false)
   playerId      String?         @unique
   tryouts       TryoutRequest[]
+  accounts      Account[]
+  sessions      Session[]
+  playerProfile Player?         @relation(fields: [playerId], references: [id])
 
   @@map("user")
 }
@@ -37,7 +27,7 @@ model User {
 model Session {
   id        String   @id
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime
   updatedAt DateTime
   ipAddress String?
@@ -45,7 +35,6 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@map("session")
 }
 
@@ -54,7 +43,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -64,6 +52,7 @@ model Account {
   password              String?
   createdAt             DateTime
   updatedAt             DateTime
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("account")
 }
@@ -83,29 +72,29 @@ model Team {
   id           String        @id @default(cuid())
   name         String
   gameId       String
-  game         Game          @relation(fields: [gameId], references: [id])
-  players      Player[]
-  achievements Achievement[]
   logoUrl      String?
   createdAt    DateTime      @default(now())
+  achievements Achievement[]
+  players      Player[]
+  game         Game          @relation(fields: [gameId], references: [id])
 }
 
 model Player {
   id        String   @id @default(cuid())
-  ign       String   @unique // In Game Name
+  ign       String   @unique
   fullName  String
-  role      String? // e.g. IGL, Sniper, Entry Fragger
+  role      String?
   teamId    String?
-  team      Team?    @relation(fields: [teamId], references: [id])
-  user      User?
   image     String?
   createdAt DateTime @default(now())
+  team      Team?    @relation(fields: [teamId], references: [id])
+  user      User?
 }
 
 model Game {
   id    String @id @default(cuid())
-  name  String @unique // PUBG Mobile, Apex Legends, etc.
-  type  String // Mobile, PC
+  name  String @unique
+  type  String
   teams Team[]
 }
 
@@ -124,10 +113,17 @@ model TryoutRequest {
   email     String
   ign       String
   game      String
+  role      String?
   discord   String
-  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  status    String   @default("PENDING")
   createdAt DateTime @default(now())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+}
 
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id])
+enum Role {
+  ADMIN
+  MANAGER
+  PLAYER
+  USER
 }
