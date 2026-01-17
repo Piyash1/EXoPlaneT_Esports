@@ -17,6 +17,9 @@ export async function GET() {
       where: { id: session.user.id },
       include: {
         playerProfile: true,
+        tryouts: {
+          orderBy: { createdAt: "desc" },
+        },
       },
     });
 

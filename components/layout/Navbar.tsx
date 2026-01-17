@@ -3,10 +3,24 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, Rocket, User } from "lucide-react";
+import {
+  Menu,
+  X,
+  Rocket,
+  User,
+  Settings,
+  LayoutDashboard,
+  ChevronDown,
+  ShieldCheck,
+  Loader2,
+  LogOut,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { authClient } from "@/lib/auth-client";
+import UserDropdown from "@/components/layout/UserDropdown";
+import Image from "next/image";
 
 const navLinks = [
   { name: "Teams", href: "/teams" },
@@ -17,7 +31,9 @@ const navLinks = [
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   const pathname = usePathname();
+  const { data: session, isPending } = authClient.useSession();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-md border-b border-white/10 transition-all duration-300">
@@ -54,19 +70,29 @@ export default function Navbar() {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/auth/login">
-              <Button
-                variant="ghost"
-                className="text-base text-muted-foreground hover:text-white"
-              >
-                Login
-              </Button>
-            </Link>
-            <Link href="/tryouts">
-              <Button variant="neon" className="text-base px-6">
-                Join Us
-              </Button>
-            </Link>
+            {!isPending && (
+              <>
+                {session ? (
+                  <UserDropdown />
+                ) : (
+                  <>
+                    <Link href="/login">
+                      <Button
+                        variant="ghost"
+                        className="text-base text-muted-foreground hover:text-white"
+                      >
+                        Login
+                      </Button>
+                    </Link>
+                    <Link href="/tryouts">
+                      <Button variant="neon" className="text-base px-6">
+                        Apply Now
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -111,16 +137,74 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="pt-4 flex flex-col gap-2">
-                <Link href="/auth/login" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full justify-start">
-                    <User className="w-4 h-4 mr-2" /> Login
-                  </Button>
-                </Link>
-                <Link href="/tryouts" onClick={() => setIsOpen(false)}>
-                  <Button variant="default" className="w-full">
-                    Join Tryouts
-                  </Button>
-                </Link>
+                {!isPending && (
+                  <>
+                    {session ? (
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full border border-primary/30 overflow-hidden relative">
+                            <Image
+                              src={session.user.image || "/default-avatar.png"}
+                              alt={session.user.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-white uppercase tracking-tighter">
+                              {session.user.name}
+                            </span>
+                            <span className="text-[10px] text-primary uppercase font-bold">
+                              {(session.user as any).role}
+                            </span>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-red-400 hover:text-red-300 hover:bg-red-400/10"
+                          disabled={isSigningOut}
+                          onClick={async () => {
+                            setIsSigningOut(true);
+                            await authClient.signOut({
+                              fetchOptions: {
+                                onSuccess: () => {
+                                  setIsSigningOut(false);
+                                  setIsOpen(false);
+                                },
+                                onError: () => {
+                                  setIsSigningOut(false);
+                                },
+                              },
+                            });
+                          }}
+                        >
+                          {isSigningOut ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <LogOut className="w-4 h-4" />
+                          )}
+                        </Button>
+                      </div>
+                    ) : (
+                      <>
+                        <Link href="/login" onClick={() => setIsOpen(false)}>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start"
+                          >
+                            <User className="w-4 h-4 mr-2" /> Login
+                          </Button>
+                        </Link>
+                        <Link href="/tryouts" onClick={() => setIsOpen(false)}>
+                          <Button variant="default" className="w-full">
+                            Apply for Roster
+                          </Button>
+                        </Link>
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

@@ -26,12 +26,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body
-        className={`${inter.variable} ${orbitron.variable} antialiased min-h-screen flex flex-col`}
-      >
-        <Navbar />
-        <main className="grow pt-16">{children}</main>
-        <Footer />
+      <body className={`${inter.variable} ${orbitron.variable} antialiased`}>
+        {children}
       </body>
     </html>
   );

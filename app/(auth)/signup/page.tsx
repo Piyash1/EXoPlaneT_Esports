@@ -11,19 +11,22 @@ import { authClient } from "@/lib/auth-client";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
-      const { data: session, error } = await authClient.signIn.email({
+      const { data: session, error } = await authClient.signUp.email({
         email,
         password,
+        name,
       });
 
       if (error) {
@@ -40,7 +43,7 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout title="SECURE LOGIN" subtitle="Welcome back, Player">
+    <AuthLayout title="CREATE PROFILE" subtitle="Join the Organization">
       <SocialAuthButtons isLoading={isLoading} setIsLoading={setIsLoading} />
 
       <div className="relative my-8">
@@ -49,12 +52,25 @@ export default function LoginPage() {
         </div>
         <div className="relative flex justify-center text-xs uppercase">
           <span className="bg-black/40 backdrop-blur-xl px-2 text-muted-foreground">
-            Or continue with account credentials
+            Or create your account
           </span>
         </div>
       </div>
 
-      <form onSubmit={handleEmailLogin} className="space-y-4">
+      <form onSubmit={handleSignup} className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-400 ml-1">
+            Full Name
+          </label>
+          <Input
+            type="text"
+            placeholder="John 'Ghost' Doe"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            disabled={isLoading}
+          />
+        </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-400 ml-1">
             Email
@@ -69,17 +85,9 @@ export default function LoginPage() {
           />
         </div>
         <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label className="text-sm font-medium text-gray-400 ml-1">
-              Password
-            </label>
-            <Link
-              href="/forgot-password"
-              className="text-[10px] text-primary hover:underline uppercase tracking-wider"
-            >
-              Forgot password?
-            </Link>
-          </div>
+          <label className="text-sm font-medium text-gray-400 ml-1">
+            Password
+          </label>
           <Input
             type="password"
             placeholder="••••••••"
@@ -98,22 +106,22 @@ export default function LoginPage() {
           {isLoading ? (
             <div className="flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin" />
-              ESTABLISHING CONNECTION...
+              CREATING ACCOUNT...
             </div>
           ) : (
-            "LOGIN TO PORTAL"
+            "JOIN THE SQUAD"
           )}
         </Button>
       </form>
 
       <div className="mt-8 pt-6 border-t border-white/5 text-center">
         <p className="text-sm text-muted-foreground">
-          New player?{" "}
+          Already have an account?{" "}
           <Link
-            href="/signup"
+            href="/login"
             className="text-white font-bold hover:text-primary transition-colors"
           >
-            CREATE ACCOUNT
+            LOGIN TO PORTAL
           </Link>
         </p>
       </div>

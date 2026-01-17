@@ -25,6 +25,7 @@ export const TryoutRequestSchema = z.object({
   ign: z.string().min(2, "IGN must be at least 2 characters"),
   game: z.string().min(2, "Game name must be at least 2 characters"),
   discord: z.string().min(2, "Discord ID must be at least 2 characters"),
+  userId: z.string().optional(),
 });
 
 export const AchievementSchema = z.object({

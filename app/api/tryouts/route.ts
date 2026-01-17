@@ -39,8 +39,12 @@ export async function POST(request: NextRequest) {
     // Validate request body
     const validatedData = TryoutRequestSchema.parse(body);
 
+    const session = await apiResponse.getSession();
     const tryoutRequest = await prisma.tryoutRequest.create({
-      data: validatedData,
+      data: {
+        ...validatedData,
+        userId: session?.user?.id || validatedData.userId,
+      },
     });
 
     return apiResponse.success(tryoutRequest, 201);

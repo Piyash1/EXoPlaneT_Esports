@@ -127,7 +127,7 @@ export default function FeaturedTeams() {
                 </CardContent>
 
                 <div className="p-6 pt-0">
-                  <Button className="w-full bg-white/5 hover:bg-primary hover:text-black border border-white/10 transition-all duration-300 group/btn">
+                  <Button className="w-full bg-primary text-black hover:bg-primary/90 hover:scale-[1.02] border-none transition-all duration-300 group/btn">
                     <span className="mr-2">View Team Profile</span>
                     <ArrowRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-1" />
                   </Button>
