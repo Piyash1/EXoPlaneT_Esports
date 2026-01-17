@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Save, ShieldAlert, Globe, Bell } from "lucide-react";
-import { toast } from "sonner"; // Assuming sonner or similar toast exists, or I'll just use alert for now if not sure. I'll stick to alert/console for "basic".
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState({

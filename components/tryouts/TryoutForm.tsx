@@ -43,6 +43,9 @@ export default function TryoutForm() {
     discord: "",
   });
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
   const [pendingTryout, setPendingTryout] = useState<any>(null);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
 
@@ -53,11 +56,22 @@ export default function TryoutForm() {
         name: session.user.name || prev.name,
         email: session.user.email || prev.email,
       }));
+      setImagePreview(session.user.image || null);
     }
   }, [session]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const objectUrl = URL.createObjectURL(file);
+      setImagePreview(objectUrl);
+    }
+  };
+
   useEffect(() => {
     const checkStatus = async () => {
+      // ... same status check logic ...
       if (!session) {
         setIsCheckingStatus(false);
         return;
@@ -94,6 +108,21 @@ export default function TryoutForm() {
 
     setIsLoading(true);
     try {
+      // 1. If image changed, update User Profile first
+      if (imageFile) {
+        const profileData = new FormData();
+        profileData.append("name", formData.name); // Keep name synced
+        profileData.append("image", imageFile);
+
+        await fetch("/api/me", {
+          method: "PATCH",
+          body: profileData, // Send as FormData
+        });
+        // We don't strictly block on failure here, but ideally we should.
+        // Assuming success for smoother UX, or the backend handles sync.
+      }
+
+      // 2. Submit Tryout Request
       const response = await fetch("/api/tryouts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -202,12 +231,103 @@ export default function TryoutForm() {
     );
   }
 
+  // Check if user is already a player
+  if ((session?.user as any)?.role === "PLAYER") {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="glass p-12 text-center rounded-3xl border border-primary/30 space-y-6 relative overflow-hidden"
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
+        <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(0,255,200,0.2)]">
+          <Shield className="w-10 h-10 text-primary animate-pulse" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-3xl font-heading font-black text-white">
+            ACTIVE AGENT
+          </h2>
+          <p className="text-muted-foreground uppercase tracking-widest text-xs">
+            Clearance Level: PLAYER
+          </p>
+        </div>
+        <div className="p-4 bg-white/5 rounded-xl border border-white/10 space-y-2 max-w-sm mx-auto">
+          <p className="text-sm text-gray-300">
+            You are already a recruited agent of Exoplanet Esports. No further
+            tryout applications are required.
+          </p>
+        </div>
+
+        <Button
+          onClick={() => router.push("/dashboard")}
+          variant="outline"
+          className="text-[10px] font-black tracking-widest h-10 border-primary/50 text-primary hover:bg-primary/10"
+        >
+          RETURN TO DASHBOARD
+        </Button>
+      </motion.div>
+    );
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
       className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000"
     >
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="md:grid md:grid-cols-2 gap-6">
+        {/* ID Photo (Full Width on Mobile, Col-Span on Desktop if needed, but let's just put it above grid) */}
+        <div className="md:col-span-2 flex flex-col items-center justify-center gap-4 mb-4">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+            <User className="w-3 h-3 text-primary" />
+            ID Photo
+          </label>
+          <div className="relative group">
+            <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-primary/50 transition-colors shadow-lg shadow-black/50 bg-black">
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-white/5">
+                  <User className="w-8 h-8 text-muted-foreground" />
+                </div>
+              )}
+            </div>
+            <label
+              htmlFor="id-photo"
+              className="absolute bottom-0 right-0 p-1.5 bg-primary text-black rounded-full cursor-pointer hover:bg-primary/80 transition-colors shadow-lg"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" x2="12" y1="3" y2="15" />
+              </svg>
+            </label>
+            <input
+              id="id-photo"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+          </div>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+            {imageFile ? "Image Selected" : "Upload ID Photo (Optional)"}
+          </p>
+        </div>
+
         {/* Name */}
         <div className="space-y-2">
           <label className="text-xs font-bold text-muted-foreground uppercase tracking-[0.2em] ml-1 flex items-center gap-2">

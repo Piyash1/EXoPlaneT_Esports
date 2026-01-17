@@ -90,7 +90,7 @@ export function ConfirmDialog({
             </div>
 
             {/* Decorative bottom line */}
-            <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-red-500/0 via-red-500/50 to-red-500/0 opacity-50" />
+            <div className="absolute bottom-0 left-0 h-1 w-full bg-linear-to-r from-red-500/0 via-red-500/50 to-red-500/0 opacity-50" />
           </motion.div>
         </div>
       )}
