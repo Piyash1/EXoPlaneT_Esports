@@ -259,7 +259,7 @@ export default function DashboardPage() {
           <div className="space-y-8">
             <div className="relative aspect-video rounded-xl border border-white/10 overflow-hidden">
               <Image
-                src="/hero-bg-pubg.png"
+                src="/hero-bg.png"
                 alt="Active Mission"
                 fill
                 className="object-cover opacity-50 grayscale group-hover:grayscale-0 transition-all duration-500 scale-110 group-hover:scale-100"

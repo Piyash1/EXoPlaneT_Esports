@@ -13,7 +13,7 @@ export default function HeroSection() {
       <div className="absolute inset-0 z-0">
         {/* Fallback Image / Poster - Using our generated asset */}
         <Image
-          src="/hero-bg-pubg.png"
+          src="/hero-bg.png"
           alt="Battle Royale Background"
           fill
           className="object-cover opacity-60"
@@ -34,8 +34,16 @@ export default function HeroSection() {
         */}
 
         {/* Cinematic Gradient Overlays */}
-        <div className="absolute inset-0 bg-linear-to-t from-background via-background/40 to-transparent" />
-        <div className="absolute inset-0 bg-linear-to-r from-background/60 via-transparent to-background/60" />
+        {/* Static Color Aura - Premium Dark Bluish Glow */}
+        <div
+          className="absolute inset-0 z-1 pointer-events-none mix-blend-screen"
+          style={{
+            boxShadow: "inset 0 0 100px 20px rgba(30, 58, 138, 0.3)",
+          }}
+        />
+
+        {/* Subtle Bottom Fade for Text Readability */}
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-transparent to-transparent z-1" />
       </div>
 
       {/* Grid Overlay */}
@@ -49,15 +57,15 @@ export default function HeroSection() {
           transition={{ duration: 1, ease: "easeOut" }}
           className="flex flex-col items-center space-y-6"
         >
-          <div className="inline-block px-6 py-2 rounded-full border border-primary/30 bg-black/60 backdrop-blur-md mb-4 shadow-[0_0_15px_rgba(0,255,200,0.2)]">
-            <span className="text-primary text-sm font-bold tracking-[0.2em] uppercase animate-pulse">
+          <div className="inline-block px-6 py-2 rounded-full border border-blue-500/30 bg-black/60 backdrop-blur-md mb-4 shadow-[0_0_15px_rgba(30,58,138,0.3)]">
+            <span className="text-blue-400 text-sm font-bold tracking-[0.2em] uppercase animate-pulse">
               Deployment Imminent
             </span>
           </div>
 
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-heading font-black tracking-tighter text-white drop-shadow-2xl">
             EXO
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-white to-secondary">
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-white to-blue-600">
               PLANET
             </span>
           </h1>
@@ -77,7 +85,7 @@ export default function HeroSection() {
               <Button
                 size="lg"
                 variant="sku"
-                className="h-16 px-12 text-xl font-bold tracking-widest shadow-[0_0_30px_rgba(0,255,200,0.4)] hover:shadow-[0_0_50px_rgba(0,255,200,0.6)] hover:scale-105 transition-all bg-primary text-black border-none"
+                className="h-16 px-12 text-xl font-bold tracking-widest shadow-[0_0_30px_rgba(30,58,138,0.5)] hover:shadow-[0_0_50px_rgba(30,58,138,0.7)] hover:scale-105 transition-all bg-blue-600 text-white border-none"
               >
                 JOIN THE SQUAD
               </Button>

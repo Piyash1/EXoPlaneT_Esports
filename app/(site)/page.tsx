@@ -3,6 +3,7 @@ import StatsSection from "@/components/home/StatsSection";
 import FeaturedTeams from "@/components/home/FeaturedTeams";
 import Achievements from "@/components/home/Achievements";
 import CTASection from "@/components/home/CTASection";
+import FooterBackground from "@/components/teams/FooterBackground";
 
 export default function Home() {
   return (
@@ -11,7 +12,10 @@ export default function Home() {
       <StatsSection />
       <FeaturedTeams />
       <Achievements />
-      <CTASection />
+      <div className="relative">
+        <FooterBackground />
+        <CTASection />
+      </div>
     </div>
   );
 }

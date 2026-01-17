@@ -1,7 +1,14 @@
 import TryoutForm from "@/components/tryouts/TryoutForm";
 import { Zap } from "lucide-react";
+import { apiResponse } from "@/lib/api-utils";
+import { redirect } from "next/navigation";
 
-export default function TryoutsPage() {
+export default async function TryoutsPage() {
+  const session = await apiResponse.getSession();
+
+  if (!session) {
+    redirect("/login?callbackUrl=/tryouts");
+  }
   return (
     <div className="container max-w-4xl py-24 px-4 mx-auto">
       <div className="text-center mb-16 space-y-4">
