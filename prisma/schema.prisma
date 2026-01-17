@@ -15,11 +15,10 @@ model User {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   emailVerified Boolean         @default(false)
-  playerId      String?         @unique
-  tryouts       TryoutRequest[]
-  accounts      Account[]
+  playerProfile Player?
   sessions      Session[]
-  playerProfile Player?         @relation(fields: [playerId], references: [id])
+  accounts      Account[]
+  tryouts       TryoutRequest[]
 
   @@map("user")
 }
@@ -88,7 +87,8 @@ model Player {
   image     String?
   createdAt DateTime @default(now())
   team      Team?    @relation(fields: [teamId], references: [id])
-  user      User?
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Game {
@@ -118,7 +118,7 @@ model TryoutRequest {
   status    String   @default("PENDING")
   createdAt DateTime @default(now())
   userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Role {

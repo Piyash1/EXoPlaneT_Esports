@@ -9,6 +9,7 @@ import {
   Swords,
   ShieldAlert,
   LogOut,
+  ArrowLeft,
   Settings,
   Menu,
 } from "lucide-react";
@@ -115,7 +116,14 @@ export function AdminSidebar() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 border-t border-white/5 bg-white/5">
+            <div className="p-4 border-t border-white/5 bg-white/5 space-y-2">
+              <Link
+                href="/"
+                className="flex items-center gap-3 w-full px-3 py-2 text-sm font-bold text-muted-foreground hover:text-white transition-colors uppercase tracking-wide group"
+              >
+                <ArrowLeft className="w-4 h-4 group-hover:text-white transition-colors" />
+                Back to Site
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="flex items-center gap-3 w-full px-3 py-2 text-sm font-bold text-muted-foreground hover:text-red-500 transition-colors uppercase tracking-wide group"

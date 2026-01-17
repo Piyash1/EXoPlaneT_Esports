@@ -42,9 +42,9 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex">
+    <div className="min-h-screen text-white flex">
       <AdminSidebar />
-      <main className="flex-1 lg:ml-64 p-8 overflow-y-auto h-screen bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-red-900/10 via-black to-black">
+      <main className="flex-1 lg:ml-64 p-8 overflow-y-auto h-screen">
         {children}
       </main>
     </div>

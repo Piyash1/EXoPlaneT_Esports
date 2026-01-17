@@ -1,25 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Table, Button } from "@/components/ui/button"; // Typo in import, but I'll write the full component code below properly
-import { Loader2, Users, Shield, UserCog, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Loader2, Users, Shield, UserCog, Mail, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-// I need an API endpoint to fetch all users.
-// I'll create a simple fetch inside useEffect assuming /api/users exists or I'll implement it.
-// Wait, I haven't implemented /api/users yet.
-// I should create that too.
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
-  // Note: We need to implement GET /api/users for this to work
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // If /api/users doesn't exist, this will fail.
-        // I will assume I need to create it.
         const res = await fetch("/api/users");
         if (res.ok) {
           const result = await res.json();
@@ -34,28 +29,54 @@ export default function AdminUsersPage() {
     fetchUsers();
   }, []);
 
+  const confirmDelete = async () => {
+    if (!userToDelete) return;
+
+    setDeletingId(userToDelete);
+    try {
+      const res = await fetch(`/api/users/${userToDelete}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setUsers((prev) => prev.filter((u) => u.id !== userToDelete));
+        setUserToDelete(null);
+      } else {
+        alert("Failed to delete user");
+      }
+    } catch (error) {
+      console.error("Delete failed", error);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className="space-y-8">
+      <ConfirmDialog
+        isOpen={!!userToDelete}
+        onClose={() => setUserToDelete(null)}
+        onConfirm={confirmDelete}
+        isLoading={!!deletingId}
+      />
       <div>
-        <h1 className="text-3xl font-heading font-black text-white uppercase tracking-tight flex items-center gap-3">
-          <Users className="w-8 h-8 text-primary" />
-          Unit Management
+        <h1 className="text-3xl font-black font-heading text-white tracking-widest uppercase mb-2">
+          User Management
         </h1>
-        <p className="text-muted-foreground text-sm uppercase tracking-widest">
-          Personnel Database & Permissions
+        <p className="text-muted-foreground">
+          View and manage registered users and their roles.
         </p>
       </div>
 
-      <div className="glass rounded-xl border border-white/10 overflow-hidden">
-        {isLoading ? (
-          <div className="p-12 flex justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-white/5 border-b border-white/5">
-                <tr>
+      <div className="glass rounded-xl overflow-hidden border border-white/10">
+        <div className="overflow-x-auto">
+          {isLoading ? (
+            <div className="p-12 flex justify-center">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            </div>
+          ) : (
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-white/5 border-b border-white/5">
                   <th className="p-4 font-bold text-muted-foreground uppercase tracking-wider text-xs">
                     Identity
                   </th>
@@ -68,7 +89,9 @@ export default function AdminUsersPage() {
                   <th className="p-4 font-bold text-muted-foreground uppercase tracking-wider text-xs">
                     Joined
                   </th>
-                  {/* Actions column if needed */}
+                  <th className="p-4 font-bold text-muted-foreground uppercase tracking-wider text-xs text-right">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -127,12 +150,29 @@ export default function AdminUsersPage() {
                     <td className="p-4 text-xs text-muted-foreground font-mono">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
+                    <td className="p-4 text-right">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={
+                          deletingId === user.id || user.role === "ADMIN"
+                        }
+                        onClick={() => setUserToDelete(user.id)}
+                        className="text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+                      >
+                        {deletingId === user.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </Button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
