@@ -48,7 +48,7 @@ export default function FeaturedTeams() {
         </div>
 
         {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {featuredTeams.map((team, index) => (
             <motion.div
               key={team.id}

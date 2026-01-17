@@ -9,7 +9,7 @@ export default function TeamsHero() {
       {/* Background Image - Synced with Home Hero */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/hero-bg.png"
+          src="/hero-teams-bg.png"
           alt="Teams Banner"
           fill
           className="object-cover opacity-60"

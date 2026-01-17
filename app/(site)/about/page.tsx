@@ -1,18 +1,28 @@
-import { Card, CardContent } from "@/components/ui/card";
+import AboutHero from "@/components/about/AboutHero";
+import CorePillars from "@/components/about/CorePillars";
+import MissionStatement from "@/components/about/MissionStatement";
+import TeamsBackground from "@/components/teams/TeamsBackground";
+import FooterBackground from "@/components/teams/FooterBackground";
 
 export default function AboutPage() {
   return (
-    <div className="container py-24">
-      <h1 className="text-4xl font-heading font-bold text-white mb-8">
-        About Exoplanet
-      </h1>
-      <Card className="glass p-12 text-center">
-        <CardContent>
-          <p className="text-muted-foreground">
-            Organization history and values coming soon.
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <main className="relative min-h-screen">
+      {/* Cinematic Duo-Tone Background */}
+      <TeamsBackground />
+
+      {/* Hero Section - The Mission Header */}
+      <AboutHero />
+
+      {/* Core Values Section */}
+      <CorePillars />
+
+      {/* Mission Details Section */}
+      <MissionStatement />
+
+      {/* Footer Area with Synced Glow */}
+      <div className="h-[20vh] relative">
+        <FooterBackground />
+      </div>
+    </main>
   );
 }
