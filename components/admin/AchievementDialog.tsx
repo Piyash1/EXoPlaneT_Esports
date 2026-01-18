@@ -16,6 +16,9 @@ import { Button } from "@/components/ui/button";
 import { HudCard } from "@/components/ui/HudCard";
 import { HudBadge } from "@/components/ui/HudBadge";
 import { cn } from "@/lib/utils";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { AchievementSchema } from "@/lib/validations";
 import { uploadImageAction } from "@/app/actions/upload";
 
 interface AchievementDialogProps {
@@ -34,22 +37,33 @@ export default function AchievementDialog({
   const [isLoading, setIsLoading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [teams, setTeams] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    image: "",
-    rank: "",
-    date: "",
-    teamId: "",
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(AchievementSchema),
+    defaultValues: {
+      title: "",
+      image: "",
+      rank: "",
+      date: new Date().toISOString().split("T")[0],
+      teamId: "",
+    },
   });
+
+  const currentImage = watch("image");
 
   useEffect(() => {
     if (open) {
       fetchTeams();
       if (achievement) {
-        setFormData({
+        reset({
           title: achievement.title || "",
           image: achievement.image || "",
           rank: achievement.rank || "",
@@ -59,7 +73,7 @@ export default function AchievementDialog({
           teamId: achievement.teamId || "",
         });
       } else {
-        setFormData({
+        reset({
           title: "",
           image: "",
           rank: "",
@@ -67,9 +81,8 @@ export default function AchievementDialog({
           teamId: "",
         });
       }
-      setError(null);
     }
-  }, [open, achievement]);
+  }, [open, achievement, reset]);
 
   const fetchTeams = async () => {
     try {
@@ -86,12 +99,11 @@ export default function AchievementDialog({
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      setError("Image size too large. Max 5MB.");
+      alert("Image size too large. Max 5MB.");
       return;
     }
 
     setIsUploading(true);
-    setError(null);
 
     try {
       const reader = new FileReader();
@@ -100,23 +112,21 @@ export default function AchievementDialog({
         const result = await uploadImageAction(base64String, "achievements");
 
         if (result.success && result.url) {
-          setFormData((prev) => ({ ...prev, image: result.url }));
+          setValue("image", result.url);
         } else {
-          setError("Failed to upload image.");
+          alert("Failed to upload image.");
         }
         setIsUploading(false);
       };
       reader.readAsDataURL(file);
     } catch (err) {
-      setError("Error processing image.");
+      alert("Error processing image.");
       setIsUploading(false);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: any) => {
     setIsLoading(true);
-    setError(null);
 
     try {
       const url = achievement
@@ -127,7 +137,7 @@ export default function AchievementDialog({
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
       const result = await res.json();
@@ -136,10 +146,10 @@ export default function AchievementDialog({
         onOpenChange(false);
         onSuccess();
       } else {
-        setError(result.error || "Failed to log achievement.");
+        alert(result.error || "Failed to log achievement.");
       }
     } catch (err) {
-      setError("Communication with command center failed.");
+      alert("Communication with command center failed.");
     } finally {
       setIsLoading(false);
     }
@@ -180,31 +190,23 @@ export default function AchievementDialog({
 
           <div className="h-px bg-white/5 w-full" />
 
-          {/* Error Message */}
-          {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-sm flex items-center gap-3 text-red-500 text-[10px] font-mono uppercase tracking-widest animate-pulse">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              {error}
-            </div>
-          )}
-
           {/* Form */}
-          <div className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
               <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                 <Trophy className="w-3 h-3 text-red-500" />
                 Achievement Title
               </label>
               <input
-                type="text"
-                required
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
+                {...register("title")}
                 placeholder="PRO LEAGUE CHAMPIONS..."
                 className="w-full h-10 bg-slate-900 border border-white/10 rounded-sm px-3 text-xs text-white focus:outline-none focus:border-red-500/50 placeholder:text-muted-foreground/30 font-mono uppercase italic font-bold"
               />
+              {errors.title && (
+                <span className="text-red-500 text-[10px] font-mono">
+                  {errors.title.message as string}
+                </span>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -214,11 +216,7 @@ export default function AchievementDialog({
                   Responsible Team
                 </label>
                 <select
-                  required
-                  value={formData.teamId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, teamId: e.target.value })
-                  }
+                  {...register("teamId")}
                   className="w-full h-10 bg-slate-900 border border-white/10 rounded-sm px-3 text-xs text-white focus:outline-none focus:border-red-500/50 appearance-none font-mono uppercase"
                 >
                   <option value="">SELECT TEAM</option>
@@ -228,6 +226,11 @@ export default function AchievementDialog({
                     </option>
                   ))}
                 </select>
+                {errors.teamId && (
+                  <span className="text-red-500 text-[10px] font-mono">
+                    {errors.teamId.message as string}
+                  </span>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -237,13 +240,14 @@ export default function AchievementDialog({
                 </label>
                 <input
                   type="date"
-                  required
-                  value={formData.date}
-                  onChange={(e) =>
-                    setFormData({ ...formData, date: e.target.value })
-                  }
+                  {...register("date")}
                   className="w-full h-10 bg-slate-900 border border-white/10 rounded-sm px-3 text-xs text-white focus:outline-none focus:border-red-500/50 font-mono"
                 />
+                {errors.date && (
+                  <span className="text-red-500 text-[10px] font-mono">
+                    {errors.date.message as string}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -256,9 +260,9 @@ export default function AchievementDialog({
               <div className="flex items-center gap-4">
                 {/* Preview Area */}
                 <div className="w-16 h-16 bg-slate-900 border border-white/10 rounded-sm flex items-center justify-center overflow-hidden relative group">
-                  {formData.image ? (
+                  {currentImage ? (
                     <Image
-                      src={formData.image}
+                      src={currentImage as string}
                       alt="Preview"
                       fill
                       className="object-cover"
@@ -272,7 +276,7 @@ export default function AchievementDialog({
                 <div className="flex-1">
                   <input
                     type="file"
-                    ref={fileInputRef}
+                    ref={imageInputRef}
                     className="hidden"
                     accept="image/*"
                     onChange={handleImageUpload}
@@ -280,7 +284,7 @@ export default function AchievementDialog({
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => imageInputRef.current?.click()}
                     disabled={isUploading}
                     className="w-full h-10 border-white/10 bg-white/5 hover:bg-white/10 text-xs font-mono uppercase tracking-wider relative"
                   >
@@ -292,7 +296,7 @@ export default function AchievementDialog({
                     ) : (
                       <>
                         <Upload className="w-3 h-3 mr-2" />
-                        {formData.image ? "Change Image" : "Upload File"}
+                        {currentImage ? "Change Image" : "Upload File"}
                       </>
                     )}
                   </Button>
@@ -306,40 +310,37 @@ export default function AchievementDialog({
                 Rank / Placement (Optional)
               </label>
               <input
-                type="text"
-                value={formData.rank}
-                onChange={(e) =>
-                  setFormData({ ...formData, rank: e.target.value })
-                }
+                {...register("rank")}
                 placeholder="#1, FINALIST, ETC."
                 className="w-full h-10 bg-slate-900 border border-white/10 rounded-sm px-3 text-xs text-white focus:outline-none focus:border-red-500/50 placeholder:text-muted-foreground/30 font-mono uppercase"
               />
             </div>
-          </div>
 
-          {/* Footer */}
-          <div className="flex gap-4 pt-4">
-            <Button
-              variant="ghost"
-              onClick={() => onOpenChange(false)}
-              className="flex-1 h-12 uppercase font-black italic tracking-widest text-xs border border-white/5 rounded-sm hover:bg-white/5"
-            >
-              Abort mission
-            </Button>
-            <Button
-              disabled={isLoading || isUploading}
-              onClick={handleSubmit}
-              className="flex-2 h-12 bg-red-600 hover:bg-red-500 text-white uppercase font-black italic tracking-widest text-xs rounded-sm transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(239,68,68,0.3)]"
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-              ) : achievement ? (
-                "Finalize Log"
-              ) : (
-                "Log Achievement"
-              )}
-            </Button>
-          </div>
+            {/* Footer */}
+            <div className="flex gap-4 pt-4">
+              <Button
+                variant="ghost"
+                type="button"
+                onClick={() => onOpenChange(false)}
+                className="flex-1 h-12 uppercase font-black italic tracking-widest text-xs border border-white/5 rounded-sm hover:bg-white/5"
+              >
+                Abort mission
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading || isUploading}
+                className="flex-2 h-12 bg-red-600 hover:bg-red-500 text-white uppercase font-black italic tracking-widest text-xs rounded-sm transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+              >
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                ) : achievement ? (
+                  "Finalize Log"
+                ) : (
+                  "Log Achievement"
+                )}
+              </Button>
+            </div>
+          </form>
         </div>
       </HudCard>
     </div>

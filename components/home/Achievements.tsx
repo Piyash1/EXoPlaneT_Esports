@@ -36,18 +36,18 @@ export default function Achievements() {
                     {item.title}
                   </h3>
                   <p className="text-sm text-primary mb-6 font-mono tracking-wider">
-                    {item.date}
+                    {item.date instanceof Date
+                      ? item.date.toLocaleDateString()
+                      : item.date}
                   </p>
                   <div className="space-y-3 pt-4 border-t border-white/5">
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Prize Pool</span>
-                      <span className="text-white font-mono font-bold text-shadow-sm">
-                        {item.prize}
-                      </span>
-                    </div>
-                    <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Squad</span>
-                      <span className="text-white">{item.team}</span>
+                      <span className="text-white">
+                        {typeof item.team === "string"
+                          ? item.team
+                          : item.team.name}
+                      </span>
                     </div>
                   </div>
                 </div>

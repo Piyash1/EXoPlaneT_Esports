@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { HudCard } from "@/components/ui/HudCard";
 import { HudBadge } from "@/components/ui/HudBadge";
 import { ScanningTerminal } from "@/components/ui/ScanningTerminal";
+import DashboardLoading from "./loading";
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
@@ -74,6 +75,10 @@ export default function AdminDashboardPage() {
     };
     fetchStats();
   }, []);
+
+  if (isLoading) {
+    return <DashboardLoading />;
+  }
 
   return (
     <div className="space-y-12 relative pb-12">
