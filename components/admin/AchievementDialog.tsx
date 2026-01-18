@@ -1,19 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import {
   Loader2,
   Trophy,
   Calendar,
   Users,
-  AlignLeft,
   X,
   AlertCircle,
+  Image as ImageIcon,
+  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { HudCard } from "@/components/ui/HudCard";
 import { HudBadge } from "@/components/ui/HudBadge";
 import { cn } from "@/lib/utils";
+import { uploadImageAction } from "@/app/actions/upload";
 
 interface AchievementDialogProps {
   open: boolean;
@@ -29,11 +32,15 @@ export default function AchievementDialog({
   onSuccess,
 }: AchievementDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [teams, setTeams] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [formData, setFormData] = useState({
     title: "",
-    description: "",
+    image: "",
+    rank: "",
     date: "",
     teamId: "",
   });
@@ -44,7 +51,8 @@ export default function AchievementDialog({
       if (achievement) {
         setFormData({
           title: achievement.title || "",
-          description: achievement.description || "",
+          image: achievement.image || "",
+          rank: achievement.rank || "",
           date: achievement.date
             ? new Date(achievement.date).toISOString().split("T")[0]
             : "",
@@ -53,7 +61,8 @@ export default function AchievementDialog({
       } else {
         setFormData({
           title: "",
-          description: "",
+          image: "",
+          rank: "",
           date: new Date().toISOString().split("T")[0],
           teamId: "",
         });
@@ -69,6 +78,38 @@ export default function AchievementDialog({
       if (result.success) setTeams(result.data);
     } catch (err) {
       console.error("Failed to fetch teams:", err);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image size too large. Max 5MB.");
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64String = reader.result as string;
+        const result = await uploadImageAction(base64String, "achievements");
+
+        if (result.success && result.url) {
+          setFormData((prev) => ({ ...prev, image: result.url }));
+        } else {
+          setError("Failed to upload image.");
+        }
+        setIsUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      setError("Error processing image.");
+      setIsUploading(false);
     }
   };
 
@@ -208,16 +249,70 @@ export default function AchievementDialog({
 
             <div className="space-y-2">
               <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <AlignLeft className="w-3 h-3 text-red-500" />
-                Tactical Description
+                <ImageIcon className="w-3 h-3 text-red-500" />
+                Proof Image / Trophy (Optional)
               </label>
-              <textarea
-                value={formData.description}
+
+              <div className="flex items-center gap-4">
+                {/* Preview Area */}
+                <div className="w-16 h-16 bg-slate-900 border border-white/10 rounded-sm flex items-center justify-center overflow-hidden relative group">
+                  {formData.image ? (
+                    <Image
+                      src={formData.image}
+                      alt="Preview"
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <ImageIcon className="w-6 h-6 text-white/20" />
+                  )}
+                </div>
+
+                {/* Upload Button */}
+                <div className="flex-1">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="w-full h-10 border-white/10 bg-white/5 hover:bg-white/10 text-xs font-mono uppercase tracking-wider relative"
+                  >
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="w-3 h-3 animate-spin mr-2" />
+                        Uploading
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3 h-3 mr-2" />
+                        {formData.image ? "Change Image" : "Upload File"}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <Trophy className="w-3 h-3 text-red-500" />
+                Rank / Placement (Optional)
+              </label>
+              <input
+                type="text"
+                value={formData.rank}
                 onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
+                  setFormData({ ...formData, rank: e.target.value })
                 }
-                placeholder="Describe the operational success..."
-                className="w-full min-h-[100px] bg-slate-900 border border-white/10 rounded-sm px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500/50 placeholder:text-muted-foreground/30 font-mono resize-none"
+                placeholder="#1, FINALIST, ETC."
+                className="w-full h-10 bg-slate-900 border border-white/10 rounded-sm px-3 text-xs text-white focus:outline-none focus:border-red-500/50 placeholder:text-muted-foreground/30 font-mono uppercase"
               />
             </div>
           </div>
@@ -232,7 +327,7 @@ export default function AchievementDialog({
               Abort mission
             </Button>
             <Button
-              disabled={isLoading}
+              disabled={isLoading || isUploading}
               onClick={handleSubmit}
               className="flex-2 h-12 bg-red-600 hover:bg-red-500 text-white uppercase font-black italic tracking-widest text-xs rounded-sm transition-all hover:scale-[1.02] shadow-[0_0_20px_rgba(239,68,68,0.3)]"
             >

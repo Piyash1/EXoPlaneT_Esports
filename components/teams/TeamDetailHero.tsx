@@ -76,7 +76,7 @@ export default function TeamDetailHero({ team }: TeamDetailHeroProps) {
                   src={team.logoUrl}
                   alt={team.name}
                   fill
-                  className="object-contain p-8 group-hover:scale-110 transition-transform duration-500"
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               ) : (
                 <Shield className="w-full h-full text-white/10" />
@@ -115,7 +115,7 @@ export default function TeamDetailHero({ team }: TeamDetailHeroProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                {/* <div className="flex items-center gap-3">
                   <div className="p-3 bg-white/5 border border-white/10 rounded-sm">
                     <Trophy className="w-5 h-5 text-secondary" />
                   </div>
@@ -127,7 +127,7 @@ export default function TeamDetailHero({ team }: TeamDetailHeroProps) {
                       #4 Worldwide
                     </p>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="flex items-center gap-3">
                   <div className="p-3 bg-white/5 border border-white/10 rounded-sm">

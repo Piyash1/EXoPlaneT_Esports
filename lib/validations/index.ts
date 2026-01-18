@@ -34,7 +34,8 @@ export const TryoutRequestSchema = z.object({
 
 export const AchievementSchema = z.object({
   title: z.string().min(2, "Achievement title must be at least 2 characters"),
-  description: z.string().optional(),
+  image: z.string().url("Invalid image URL").optional().or(z.literal("")),
+  rank: z.string().optional(),
   date: z
     .string()
     .or(z.date())

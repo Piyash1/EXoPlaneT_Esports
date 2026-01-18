@@ -35,7 +35,7 @@ export default function TeamCardDetailed({ team, index }: TeamCardProps) {
               src={logo}
               alt={team.name}
               fill
-              className="object-contain p-8 transition-transform duration-700 group-hover:scale-110"
+              className="object-cover transition-transform duration-700 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-linear-to-r from-black/20 via-transparent to-black/60 md:bg-linear-to-r md:from-transparent md:to-black/80" />
 

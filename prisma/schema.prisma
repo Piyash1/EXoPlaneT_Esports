@@ -102,12 +102,13 @@ model Game {
 }
 
 model Achievement {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  date        DateTime
-  teamId      String
-  team        Team     @relation(fields: [teamId], references: [id])
+  id     String   @id @default(cuid())
+  title  String
+  image  String?
+  rank   String?
+  date   DateTime
+  teamId String
+  team   Team     @relation(fields: [teamId], references: [id])
 }
 
 model TryoutRequest {

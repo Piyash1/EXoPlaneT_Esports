@@ -15,7 +15,8 @@ export interface Achievement {
   title: string;
   date: string | Date;
   team: string | { name: string };
-  description?: string | null;
+  image?: string | null;
+  rank?: string | null;
 }
 
 export interface StatItem {
@@ -61,18 +62,24 @@ export const achievements: Achievement[] = [
     title: "PMCO Regional Champions",
     date: "2024",
     team: "Alpha Squad",
+    rank: "#1",
+    image: "/assets/images/projects/project1.png", // Placeholder
   },
   {
     id: 2,
     title: "Valorant Challengers Runner-up",
     date: "2024",
     team: "Nova Force",
+    rank: "#2",
+    image: "/assets/images/projects/project2.png", // Placeholder
   },
   {
     id: 3,
     title: "Apex Global Series Finalist",
     date: "2023",
     team: "Predators",
+    rank: "Finalist",
+    image: "/assets/images/projects/project3.png", // Placeholder
   },
 ];
 
