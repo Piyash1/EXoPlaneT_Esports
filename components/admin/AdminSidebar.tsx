@@ -13,6 +13,7 @@ import {
   Settings,
   Menu,
   ChevronRight,
+  Trophy,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
@@ -34,6 +35,11 @@ const sidebarItems = [
     title: "Teams",
     href: "/admin/teams",
     icon: ShieldAlert,
+  },
+  {
+    title: "Achievements",
+    href: "/admin/achievements",
+    icon: Trophy,
   },
   {
     title: "Users",

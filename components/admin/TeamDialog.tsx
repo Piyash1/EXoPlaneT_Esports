@@ -35,6 +35,9 @@ export function TeamDialog({
   const [games, setGames] = useState<any[]>([]);
   const [name, setName] = useState("");
   const [gameId, setGameId] = useState("");
+  const [wins, setWins] = useState(0);
+  const [rank, setRank] = useState("Tier 1");
+  const [readiness, setReadiness] = useState(100);
   const [logoBase64, setLogoBase64] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,10 +50,16 @@ export function TeamDialog({
       if (team) {
         setName(team.name);
         setGameId(team.gameId);
+        setWins(team.wins || 0);
+        setRank(team.rank || "Tier 1");
+        setReadiness(team.readiness || 100);
         setPreviewUrl(team.logoUrl);
       } else {
         setName("");
         setGameId("");
+        setWins(0);
+        setRank("Tier 1");
+        setReadiness(100);
         setPreviewUrl(null);
       }
       setLogoBase64(null);
@@ -108,6 +117,9 @@ export function TeamDialog({
         body: JSON.stringify({
           name,
           gameId,
+          wins,
+          rank,
+          readiness,
           logoUrl: logoBase64 || previewUrl || "", // Send base64 or existing URL
         }),
       });
@@ -265,6 +277,49 @@ export function TeamDialog({
                   ))}
                 </select>
               )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                  Wins
+                </label>
+                <input
+                  type="number"
+                  value={wins}
+                  onChange={(e) => setWins(parseInt(e.target.value) || 0)}
+                  className="w-full h-10 bg-slate-900 border border-white/10 rounded-sm px-3 text-xs text-white focus:outline-none focus:border-red-500/50 font-mono"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                  Rank
+                </label>
+                <input
+                  type="text"
+                  value={rank}
+                  onChange={(e) => setRank(e.target.value)}
+                  placeholder="Tier 1"
+                  className="w-full h-10 bg-slate-900 border border-white/10 rounded-sm px-3 text-xs text-white focus:outline-none focus:border-red-500/50 font-mono uppercase"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                  Ready %
+                </label>
+                <input
+                  type="number"
+                  value={readiness}
+                  max={100}
+                  min={0}
+                  onChange={(e) =>
+                    setReadiness(
+                      Math.min(100, Math.max(0, parseInt(e.target.value) || 0)),
+                    )
+                  }
+                  className="w-full h-10 bg-slate-900 border border-white/10 rounded-sm px-3 text-xs text-white focus:outline-none focus:border-red-500/50 font-mono"
+                />
+              </div>
             </div>
           </div>
 

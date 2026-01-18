@@ -63,7 +63,16 @@ export async function POST(request: NextRequest) {
     }
 
     const team = await prisma.team.create({
-      data: validatedData,
+      data: {
+        name: validatedData.name,
+        logoUrl: validatedData.logoUrl,
+        wins: validatedData.wins,
+        rank: validatedData.rank,
+        readiness: validatedData.readiness,
+        game: {
+          connect: { id: validatedData.gameId },
+        },
+      },
     });
 
     return apiResponse.success(team, 201);

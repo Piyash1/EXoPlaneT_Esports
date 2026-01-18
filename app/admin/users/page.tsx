@@ -41,7 +41,8 @@ export default function AdminUsersPage() {
         setUsers((prev) => prev.filter((u) => u.id !== userToDelete));
         setUserToDelete(null);
       } else {
-        alert("Failed to delete user");
+        const result = await res.json();
+        console.error("Failed to delete user:", result.error || "System Error");
       }
     } catch (error) {
       console.error("Delete failed", error);

@@ -80,7 +80,7 @@ export function AssignPlayerDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+    <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
       <HudCard variant="primary" className="w-full max-w-xl overflow-visible">
         <div className="space-y-6">
           {/* Header */}

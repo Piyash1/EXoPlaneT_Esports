@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function TeamsHero() {
   return (
-    <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
+    <section className="relative h-[45vh] flex items-center justify-center overflow-hidden">
       {/* Background Image - Synced with Home Hero */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -40,14 +40,14 @@ export default function TeamsHero() {
         >
           <div className="inline-block px-6 py-2 rounded-full border border-blue-500/30 bg-black/60 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(30,58,138,0.3)]">
             <span className="text-blue-400 text-sm font-bold tracking-[0.2em] uppercase animate-pulse">
-              Rosters Active
+              Teams Active
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-heading font-black text-white tracking-tight drop-shadow-2xl">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-heading font-black text-white tracking-tight drop-shadow-2xl">
             OUR{" "}
             <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-blue-600">
-              SQUADS
+              TEAMS
             </span>
           </h1>
 

@@ -9,6 +9,9 @@ export const TeamSchema = z.object({
   name: z.string().min(2, "Team name must be at least 2 characters"),
   gameId: z.string().cuid("Invalid Game ID"),
   logoUrl: z.string().optional().or(z.literal("")),
+  wins: z.number().int().min(0).default(0),
+  rank: z.string().default("Tier 1"),
+  readiness: z.number().int().min(0).max(100).default(100),
 });
 
 export const PlayerSchema = z.object({

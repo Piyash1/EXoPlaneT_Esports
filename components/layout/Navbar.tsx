@@ -25,6 +25,7 @@ import Image from "next/image";
 const navLinks = [
   { name: "Home", href: "/" },
   { name: "Teams", href: "/teams" },
+  { name: "Tournaments", href: "/tournaments" },
   { name: "Achievements", href: "/achievements" },
   { name: "About", href: "/about" },
 ];

@@ -10,7 +10,7 @@ import { uploadToCloudinary } from "@/lib/cloudinary";
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -30,6 +30,9 @@ export async function GET(
         achievements: {
           orderBy: { date: "desc" },
         },
+        _count: {
+          select: { players: true },
+        },
       },
     });
 
@@ -47,7 +50,7 @@ export async function GET(
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await apiResponse.requireRole(["ADMIN", "MANAGER"]);
@@ -65,9 +68,14 @@ export async function PATCH(
       );
     }
 
+    const { gameId, ...updateFields } = validatedData;
+
     const team = await prisma.team.update({
       where: { id },
-      data: validatedData,
+      data: {
+        ...updateFields,
+        ...(gameId ? { game: { connect: { id: gameId } } } : {}),
+      },
     });
 
     return apiResponse.success(team);
@@ -88,7 +96,7 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await apiResponse.requireRole(["ADMIN"]);

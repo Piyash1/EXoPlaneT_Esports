@@ -11,11 +11,11 @@ export interface Team {
 }
 
 export interface Achievement {
-  id: number;
+  id: string | number;
   title: string;
-  date: string;
-  prize: string;
-  team: string;
+  date: string | Date;
+  team: string | { name: string };
+  description?: string | null;
 }
 
 export interface StatItem {
@@ -60,21 +60,18 @@ export const achievements: Achievement[] = [
     id: 1,
     title: "PMCO Regional Champions",
     date: "2024",
-    prize: "$50,000",
     team: "Alpha Squad",
   },
   {
     id: 2,
     title: "Valorant Challengers Runner-up",
     date: "2024",
-    prize: "$20,000",
     team: "Nova Force",
   },
   {
     id: 3,
     title: "Apex Global Series Finalist",
     date: "2023",
-    prize: "$15,000",
     team: "Predators",
   },
 ];

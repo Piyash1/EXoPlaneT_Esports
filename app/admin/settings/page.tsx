@@ -23,8 +23,8 @@ export default function AdminSettingsPage() {
     setIsSaving(true);
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsSaving(false);
-    alert("Settings saved successfully (Simulation)");
+    setIsSaving(true); // Keep it "true" for a moment to show success if needed
+    setTimeout(() => setIsSaving(false), 2000);
   };
 
   return (

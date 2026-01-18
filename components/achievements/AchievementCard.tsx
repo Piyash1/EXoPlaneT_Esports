@@ -48,17 +48,8 @@ export default function AchievementCard({
                   Date
                 </span>
               </div>
-              <p className="text-white font-bold text-sm">{achievement.date}</p>
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-primary/60">
-                <DollarSign className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">
-                  Prize Pool
-                </span>
-              </div>
-              <p className="text-yellow-500 font-bold text-sm">
-                {achievement.prize}
+              <p className="text-white font-bold text-sm">
+                {new Date(achievement.date).getFullYear()}
               </p>
             </div>
             <div className="space-y-1 col-span-2 pt-2">
@@ -69,7 +60,11 @@ export default function AchievementCard({
                 </span>
               </div>
               <p className="text-white/80 font-medium text-sm italic">
-                "{achievement.team}"
+                "
+                {typeof achievement.team === "object"
+                  ? achievement.team?.name
+                  : achievement.team}
+                "
               </p>
             </div>
           </div>
