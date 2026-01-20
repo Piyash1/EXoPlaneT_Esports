@@ -3,11 +3,14 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+import { LucideIcon } from "lucide-react";
+
 interface HudBadgeProps {
   label: string;
   variant?: "primary" | "secondary" | "danger" | "warning";
   className?: string;
   glitch?: boolean;
+  icon?: LucideIcon;
 }
 
 export function HudBadge({
@@ -15,6 +18,7 @@ export function HudBadge({
   variant = "primary",
   className,
   glitch = true,
+  icon: Icon,
 }: HudBadgeProps) {
   const variants = {
     primary: "text-primary border-primary/30 bg-primary/5",
@@ -50,6 +54,7 @@ export function HudBadge({
           boxShadow: `inset 0 0 10px ${glowColors[variant].replace("0.5", "0.1")}`,
         }}
       >
+        {Icon && <Icon className="w-3 h-3 mr-2 inline-block -translate-y-px" />}
         {label}
       </motion.div>
 

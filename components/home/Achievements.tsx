@@ -1,6 +1,7 @@
 "use client";
 
 import { achievements } from "@/lib/data";
+import { HudCard } from "@/components/ui/HudCard";
 
 export default function Achievements() {
   return (
@@ -24,35 +25,30 @@ export default function Achievements() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {achievements.map((item, i) => (
-            <div key={item.id} className="relative group">
-              {/* Connector Line (Desktop) - Decorative */}
-              <div className="hidden lg:block absolute top-1/2 -left-4 w-4 h-px bg-white/10 group-hover:bg-primary/50 transition-colors" />
-
-              <div className="absolute -inset-0.5 bg-linear-to-r from-primary to-secondary rounded-xl opacity-20 blur-md group-hover:opacity-60 transition duration-500 group-hover:duration-200" />
-              <div className="relative h-full bg-black/80 backdrop-blur-xl rounded-lg p-8 flex flex-col justify-between border border-white/10 group-hover:border-white/30 transition-colors">
-                <div>
-                  <div className="text-white/5 font-heading font-bold text-6xl absolute top-2 right-4 select-none group-hover:text-primary/10 transition-colors">{`0${i + 1}`}</div>
-                  <h3 className="text-xl font-bold text-white mb-2 pr-8 group-hover:text-primary transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-primary mb-6 font-mono tracking-wider">
-                    {item.date instanceof Date
-                      ? item.date.toLocaleDateString()
-                      : item.date}
-                  </p>
-                  <div className="space-y-3 pt-4 border-t border-white/5">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Squad</span>
-                      <span className="text-white">
-                        {typeof item.team === "string"
-                          ? item.team
-                          : item.team.name}
-                      </span>
-                    </div>
-                  </div>
+            <HudCard
+              key={item.id}
+              variant="ghost"
+              delay={i * 0.1}
+              className="h-full group"
+            >
+              <div className="text-white/5 font-heading font-bold text-6xl absolute top-2 right-4 select-none group-hover:text-primary/10 transition-colors">{`0${i + 1}`}</div>
+              <h3 className="text-xl font-bold text-white mb-2 pr-8 group-hover:text-primary transition-colors">
+                {item.title}
+              </h3>
+              <p className="text-sm text-primary mb-6 font-mono tracking-wider">
+                {item.date instanceof Date
+                  ? item.date.toLocaleDateString()
+                  : item.date}
+              </p>
+              <div className="space-y-3 pt-4 border-t border-white/5">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Squad</span>
+                  <span className="text-white">
+                    {typeof item.team === "string" ? item.team : item.team.name}
+                  </span>
                 </div>
               </div>
-            </div>
+            </HudCard>
           ))}
         </div>
       </div>

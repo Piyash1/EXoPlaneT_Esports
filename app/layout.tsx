@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Orbitron } from "next/font/google";
 import "./globals.css";
+import CustomCursor from "@/components/ui/CustomCursor";
+import ScrollProgress from "@/components/ui/ScrollProgress";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,6 +27,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} ${orbitron.variable} antialiased`}>
+        <ScrollProgress />
+        <CustomCursor />
         {children}
       </body>
     </html>

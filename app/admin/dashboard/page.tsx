@@ -19,6 +19,8 @@ import { HudBadge } from "@/components/ui/HudBadge";
 import { ScanningTerminal } from "@/components/ui/ScanningTerminal";
 import DashboardLoading from "./loading";
 
+import { GlitchText } from "@/components/ui/GlitchText";
+
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({
     users: 0,
@@ -91,17 +93,29 @@ export default function AdminDashboardPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <HudBadge label="Clearance: Level 5" variant="danger" />
-            <HudBadge label="Status: High Alert" variant="warning" />
+            <HudBadge
+              label="Clearance: Level 5"
+              variant="danger"
+              icon={ShieldAlert}
+            />
+            <HudBadge
+              label="Status: High Alert"
+              variant="warning"
+              icon={Activity}
+              glitch={true}
+            />
           </div>
           <div className="space-y-1">
-            <h1 className="text-4xl md:text-5xl font-heading font-black text-white uppercase italic tracking-tighter">
-              Command <span className="text-red-500">Center</span>
-            </h1>
+            <GlitchText
+              text="COMMAND CENTER"
+              as="h1"
+              variant="white"
+              className="text-4xl md:text-5xl font-black italic text-glow-danger"
+            />
             <div className="flex items-center gap-2 text-muted-foreground">
               <span className="w-12 h-0.5 bg-red-600/50" />
-              <p className="text-[10px] font-mono font-bold uppercase tracking-[0.4em]">
-                System Master Access
+              <p className="text-[10px] font-mono font-bold uppercase tracking-[0.4em] opacity-60">
+                System Master Access Initialized
               </p>
             </div>
           </div>
