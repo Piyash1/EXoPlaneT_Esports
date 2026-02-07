@@ -12,6 +12,7 @@ export default function HeroSection() {
       {/* Video Background Container */}
       <div className="absolute inset-0 z-0">
         {/* Fallback Image / Poster - Using our generated asset */}
+        {/* 
         <Image
           src="/hero-bg.png"
           alt="Battle Royale Background"
@@ -19,19 +20,19 @@ export default function HeroSection() {
           className="object-cover opacity-60"
           priority
         />
-
-        {/* Video Element - Uncomment and add your video file to public/hero-video.mp4
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline 
-          className="w-full h-full object-cover opacity-50"
-          poster="/hero-bg-pubg.png"
-        >
-          <source src="/hero-video.mp4" type="video/mp4" />
-        </video>
         */}
+
+        {/* Video Element */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-cover opacity-50"
+          poster="/hero-bg.png"
+        >
+          <source src="/animated-hero.mp4" type="video/mp4" />
+        </video>
 
         {/* Cinematic Gradient Overlays */}
         {/* Static Color Aura - Premium Dark Bluish Glow */}
